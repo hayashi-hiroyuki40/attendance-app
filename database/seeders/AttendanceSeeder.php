@@ -35,7 +35,7 @@ class AttendanceSeeder extends Seeder
                 ]);
 
                 AttendanceBreak::create([
-                    'attendance_records_id' => $attendance->id,
+                    'attendance_record_id' => $attendance->id,
                     'break_in' => (clone $date)->setTime(12, 0),
                     'break_out' => (clone $date)->setTime(13, 0),
                 ]);

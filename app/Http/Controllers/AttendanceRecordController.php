@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\AttendanceRecord;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AttendanceRecordController extends Controller
@@ -45,7 +45,7 @@ class AttendanceRecordController extends Controller
 
         switch ($action) {
             case 'clock_in':
-                if ($currentStatus === '勤務外' && !$attendance) {
+                if ($currentStatus === '勤務外' && ! $attendance) {
                     AttendanceRecord::create([
                         'user_id' => $user->id,
                         'date' => $today,

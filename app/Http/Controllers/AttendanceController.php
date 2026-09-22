@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttendanceCorrectionRequest;
+use App\Models\AttendanceCorrection;
 use App\Models\AttendanceRecord;
+use App\Models\CorrectionBreak;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
@@ -25,7 +29,7 @@ class AttendanceController extends Controller
             ->get();
 
         $formattedAttendanceRecords = $records->map(function ($record) {
-            $breakMinutes = $record->breaks->sum(function ($b) {
+            $breakMinutes = $record->attendanceBreaks->sum(function ($b) {
                 return match (true) {
                     ! empty($b->break_in) && ! empty($b->break_out) => Carbon::parse($b->break_out)->diffInMinutes(Carbon::parse($b->break_in)),
                     default => 0,
@@ -61,7 +65,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
 
-        $record = AttendanceRecord::with(['attendanceBreaks', 'attendanceCorrections' => fn ($q) => $q->where('status', 'pending')])
+        $record = AttendanceRecord::with(['attendanceBreaks', 'attendanceCorrections' => fn ($q) => $q->where('status', 'pending')->with('correctionsBreaks')])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 
@@ -69,20 +73,76 @@ class AttendanceController extends Controller
 
         $pendingCorrection = $record->attendanceCorrections->first();
 
-        $data = [
-            'id' => $record->id,
-            'year' => $carbonDate->format('Y年'),
-            'date' => $carbonDate->format('n月j日'),
-            'clock_in' => $record->clock_in ? Carbon::parse($record->clock_in)->format('H:i') : '',
-            'clock_out' => $record->clock_out ? Carbon::parse($record->clock_out)->format('H:i') : '',
-            'comment' => $pendingCorrection->reason ?? '',
-            'application' => $pendingCorrection,
-            'breaks' => $record->breaks->map(fn ($b) => [
-                'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
-                'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
-            ])->toArray(),
-        ];
+        if ($pendingCorrection) {
+            $data = [
+                'id' => $record->id,
+                'year' => $carbonDate->format('Y年'),
+                'date' => $carbonDate->format('n月j日'),
+                'clock_in' => $pendingCorrection->clock_in ? Carbon::parse($pendingCorrection->clock_in)->format('H:i') : '',
+                'clock_out' => $pendingCorrection->clock_out ? Carbon::parse($pendingCorrection->clock_out)->format('H:i') : '',
+                'comment' => $pendingCorrection->reason ?? '',
+                'application' => $pendingCorrection,
+                'breaks' => $pendingCorrection->correctionsBreaks->map(fn ($b) => [
+                    'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
+                    'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
+                ])->toArray(),
+            ];
+        } else {
+            $data = [
+                'id' => $record->id,
+                'year' => $carbonDate->format('Y年'),
+                'date' => $carbonDate->format('n月j日'),
+                'clock_in' => $record->clock_in ? Carbon::parse($record->clock_in)->format('H:i') : '',
+                'clock_out' => $record->clock_out ? Carbon::parse($record->clock_out)->format('H:i') : '',
+                'comment' => $pendingCorrection->reason ?? '',
+                'application' => $pendingCorrection,
+                'breaks' => $record->breaks->map(fn ($b) => [
+                    'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
+                    'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
+                ])->toArray(),
+            ];
+        }
 
         return view('attendance.detail', compact('user', 'data'));
+    }
+
+    public function store(AttendanceCorrectionRequest $request, int $id)
+    {
+        $validated = $request->validated();
+
+        $record = AttendanceRecord::where('user_id', Auth::id())->findOrFail($id);
+
+        if ($record->attendanceCorrections()->where('status', 'pending')->exists()) {
+            return back()->withErrors(['status' => '承認待ちのため修正できません。']);
+        }
+
+        DB::transaction(function () use ($validated, $record) {
+            $dateStr = Carbon::parse($record->date)->format('Y-m-d');
+
+            $correction = AttendanceCorrection::create([
+                'attendance_record_id' => $record->id,
+                'user_id' => Auth::id(),
+                'clock_in' => Carbon::parse($dateStr.' '.$validated['new_clock_in']),
+                'clock_out' => Carbon::parse($dateStr.' '.$validated['new_clock_out']),
+                'reason' => $validated['comment'],
+                'status' => 'pending',
+            ]);
+
+            if (! empty($validated['new_break_in']) && is_array($validated['new_break_in'])) {
+                foreach ($validated['new_break_in'] as $index => $breakIn) {
+                    $breakOut = $validated['new_break_out'][$index] ?? null;
+
+                    if (! empty($breakIn) && ! empty($breakOut)) {
+                        CorrectionBreak::create([
+                            'attendance_corrections_id' => $correction->id,
+                            'break_in' => Carbon::parse($dateStr.' '.$breakIn),
+                            'break_out' => Carbon::parse($dateStr.' '.$breakOut),
+                        ]);
+                    }
+                }
+            }
+        });
+
+        return redirect('/application/list');
     }
 }

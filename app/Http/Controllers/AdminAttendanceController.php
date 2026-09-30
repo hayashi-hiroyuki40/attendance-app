@@ -20,7 +20,7 @@ class AdminAttendanceController extends Controller
         $users = User::where('role', 'user')->get();
         $attendanceRecords = AttendanceRecord::with('attendanceBreaks')->whereDate('date', $date)->get();
 
-        return view('admin.attendance.index', compact('date', 'previousDay', 'nextDay', 'users', 'attendanceRecords'));
+        return view('admin.admin-attendance-list', compact('date', 'previousDay', 'nextDay', 'users', 'attendanceRecords'));
     }
 
     public function show(int $id)
@@ -43,7 +43,7 @@ class AdminAttendanceController extends Controller
             ])->toArray(),
         ];
 
-        return view('admin.attendance.detail', compact('user', 'attendanceRecord'));
+        return view('admin.admin-detail', compact('user', 'attendanceRecord'));
     }
 
     public function update(UpdateAttendanceRequest $request, int $id)

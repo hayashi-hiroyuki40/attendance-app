@@ -42,10 +42,6 @@ class AttendanceController extends Controller
                 $totalMinutes = $workMinutes - $breakMinutes;
 
                 $totalMinutes = $workMinutes - $breakMinutes;
-
-                if ($totalMinutes < 0) {
-                    $totalMinutes = 0;
-                }
             }
 
             return [
@@ -58,7 +54,7 @@ class AttendanceController extends Controller
             ];
         });
 
-        return view('attendance.index', compact('date', 'previousMonth', 'nextMonth', 'formattedAttendanceRecords'));
+        return view('user.user-attendance-list', compact('date', 'previousMonth', 'nextMonth', 'formattedAttendanceRecords'));
     }
 
     public function show(int $id)
@@ -96,14 +92,14 @@ class AttendanceController extends Controller
                 'clock_out' => $record->clock_out ? Carbon::parse($record->clock_out)->format('H:i') : '',
                 'comment' => $pendingCorrection->reason ?? '',
                 'application' => $pendingCorrection,
-                'breaks' => $record->breaks->map(fn ($b) => [
+                'breaks' => $record->attendanceBreaks->map(fn ($b) => [
                     'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
                     'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
                 ])->toArray(),
             ];
         }
 
-        return view('attendance.detail', compact('user', 'data'));
+        return view('user.user-detail', compact('user', 'data'));
     }
 
     public function store(AttendanceCorrectionRequest $request, int $id)
@@ -143,6 +139,6 @@ class AttendanceController extends Controller
             }
         });
 
-        return redirect('/application/list');
+        return redirect('user/user-application-list');
     }
 }

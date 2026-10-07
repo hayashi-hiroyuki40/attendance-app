@@ -14,7 +14,7 @@ class AttendanceCorrection extends Model
         'user_id',
         'clock_in',
         'clock_out',
-        'reason',
+        'comment',
         'status',
     ];
 

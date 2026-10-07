@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\DB;
 
 class AdminCorrectionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $status = $request->input('status', '承認待ち');
+
         $applications = AttendanceCorrection::with(['user', 'AttendanceRecord'])
+            ->where('status', $status)
             ->orderBy('created_at', 'desc')
             ->get();
 

@@ -17,7 +17,7 @@ class AdminAttendanceController extends Controller
         $previousDay = $date->copy()->subDay()->format('Y-m-d');
         $nextDay = $date->copy()->addDay()->format('Y-m-d');
 
-        $users = User::where('role', 'user')->get();
+        $users = User::where('admin_status', false)->get();
         $attendanceRecords = AttendanceRecord::with('attendanceBreaks')->whereDate('date', $date)->get();
 
         return view('admin.admin-attendance-list', compact('date', 'previousDay', 'nextDay', 'users', 'attendanceRecords'));
@@ -37,7 +37,7 @@ class AdminAttendanceController extends Controller
             'clock_in' => $record->clock_in ? Carbon::parse($record->clock_in)->format('H:i') : '',
             'clock_out' => $record->clock_out ? Carbon::parse($record->clock_out)->format('H:i') : '',
             'comment' => '',
-            'breaks' => $record->attendanceBreaks->map(fn ($b) => [
+            'breaks' => $record->attendanceBreaks->map(fn($b) => [
                 'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
                 'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
             ])->toArray(),
@@ -52,7 +52,7 @@ class AdminAttendanceController extends Controller
 
         $record = AttendanceRecord::findOrFail($id);
 
-        if ($record->attendanceCorrections()->where('status', 'pending')->exists()) {
+        if ($record->attendanceCorrections()->where('status', '承認待ち')->exists()) {
             return back()->withErrors(['status' => '承認待ちのため修正はできません。']);
         }
 
@@ -60,8 +60,9 @@ class AdminAttendanceController extends Controller
             $dateStr = Carbon::parse($record->date)->format('Y-m-d');
 
             $record->update([
-                'clock_in' => Carbon::parse($dateStr.' '.$validated['new_clock_in']),
-                'clock_out' => Carbon::parse($dateStr.' '.$validated['new_clock_out']),
+                'clock_in' => Carbon::parse($dateStr . ' ' . $validated['new_clock_in']),
+                'clock_out' => Carbon::parse($dateStr . ' ' . $validated['new_clock_out']),
+                'comment'   => $validated['comment'] ?? '',
             ]);
 
             $record->attendanceBreaks()->delete();
@@ -72,14 +73,14 @@ class AdminAttendanceController extends Controller
 
                     if (! empty($breakIn) && ! empty($breakOut)) {
                         $record->attendanceBreaks()->create([
-                            'break_in' => Carbon::parse($dateStr.' '.$breakIn),
-                            'break_out' => Carbon::parse($dateStr.' '.$breakOut),
+                            'break_in' => Carbon::parse($dateStr . ' ' . $breakIn),
+                            'break_out' => Carbon::parse($dateStr . ' ' . $breakOut),
                         ]);
                     }
                 }
             }
         });
 
-        return redirect('/attendance/'.$id);
+        return redirect('/attendance/' . $id);
     }
 }

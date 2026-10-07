@@ -30,6 +30,6 @@ class AttendanceCorrection extends Model
 
     public function correctionBreaks()
     {
-        return $this->hasMany(CorrectionBreak::class);
+        return $this->hasMany(CorrectionBreak::class, 'attendance_correction_id');
     }
 }

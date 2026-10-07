@@ -61,12 +61,11 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
 
-        $record = AttendanceRecord::with(['attendanceBreaks', 'attendanceCorrections' => fn($q) => $q->where('status', 'pending')->with('correctionsBreaks')])
+        $record = AttendanceRecord::with(['attendanceBreaks', 'attendanceCorrections' => fn($q) => $q->where('status', '承認待ち')->with('correctionBreaks')])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 
         $carbonDate = Carbon::parse($record->date);
-
         $pendingCorrection = $record->attendanceCorrections->first();
 
         if ($pendingCorrection) {
@@ -76,26 +75,49 @@ class AttendanceController extends Controller
                 'date' => $carbonDate->format('n月j日'),
                 'clock_in' => $pendingCorrection->clock_in ? Carbon::parse($pendingCorrection->clock_in)->format('H:i') : '',
                 'clock_out' => $pendingCorrection->clock_out ? Carbon::parse($pendingCorrection->clock_out)->format('H:i') : '',
-                'comment' => $pendingCorrection->reason ?? '',
+                'comment' => $pendingCorrection->comment ?? '',
                 'application' => $pendingCorrection,
-                'breaks' => $pendingCorrection->correctionsBreaks->map(fn($b) => [
+                'breaks' => $pendingCorrection->correctionBreaks->map(fn($b) => [
                     'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
                     'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
                 ])->toArray(),
             ];
         } else {
+            $clockIn = old('new_clock_in', $record->clock_in ? Carbon::parse($record->clock_in)->format('H:i') : '');
+            $clockOut = old('new_clock_out', $record->clock_out ? Carbon::parse($record->clock_out)->format('H:i') : '');
+            $comment = old('comment', $record->comment ?? '');
+
+            if (old('new_break_in') !== null && is_array(old('new_break_in'))) {
+                $breaks = [];
+                $oldBreakIns = old('new_break_in');
+                $oldBreakOuts = old('new_break_out', []);
+
+                foreach ($oldBreakIns as $index => $breakIn) {
+                    $breaks[] = [
+                        'break_in'  => $breakIn ?? '',
+                        'break_out' => $oldBreakOuts[$index] ?? '',
+                    ];
+                }
+
+                if (!empty($breaks) && end($breaks)['break_in'] === '' && end($breaks)['break_out'] === '') {
+                    array_pop($breaks);
+                }
+            } else {
+                $breaks = $record->attendanceBreaks->map(fn($b) => [
+                    'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
+                    'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
+                ])->toArray();
+            }
+
             $data = [
                 'id' => $record->id,
                 'year' => $carbonDate->format('Y年'),
                 'date' => $carbonDate->format('n月j日'),
-                'clock_in' => $record->clock_in ? Carbon::parse($record->clock_in)->format('H:i') : '',
-                'clock_out' => $record->clock_out ? Carbon::parse($record->clock_out)->format('H:i') : '',
-                'comment' => $pendingCorrection->reason ?? '',
+                'clock_in' => $clockIn,
+                'clock_out' => $clockOut,
+                'comment' => $comment,
                 'application' => $pendingCorrection,
-                'breaks' => $record->attendanceBreaks->map(fn($b) => [
-                    'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
-                    'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
-                ])->toArray(),
+                'breaks' => $breaks,
             ];
         }
 
@@ -115,8 +137,8 @@ class AttendanceController extends Controller
         DB::transaction(function () use ($validated, $record) {
             $dateStr = Carbon::parse($record->date)->format('Y-m-d');
 
-            $clockIn = $validated['clock_in'] ?? $validated['new_clock_in'];
-            $clockOut = $validated['clock_out'] ?? $validated['new_clock_out'];
+            $clockIn  = $validated['new_clock_in'];
+            $clockOut = $validated['new_clock_out'];
 
             $correction = AttendanceCorrection::create([
                 'attendance_record_id' => $record->id,
@@ -127,8 +149,8 @@ class AttendanceController extends Controller
                 'status' => '承認待ち',
             ]);
 
-            $breakIns = $validated['break_in'] ?? $validated['new_break_in'] ?? [];
-            $breakOuts = $validated['break_out'] ?? $validated['new_break_out'] ?? [];
+            $breakIns  = $validated['new_break_in']  ?? [];
+            $breakOuts = $validated['new_break_out'] ?? [];
 
             if (! empty($breakIns) && is_array($breakIns)) {
                 foreach ($breakIns as $index => $breakIn) {
@@ -136,7 +158,7 @@ class AttendanceController extends Controller
 
                     if (! empty($breakIn) && ! empty($breakOut)) {
                         CorrectionBreak::create([
-                            'attendance_corrections_id' => $correction->id,
+                            'attendance_correction_id' => $correction->id,
                             'break_in' => Carbon::parse($dateStr . ' ' . $breakIn),
                             'break_out' => Carbon::parse($dateStr . ' ' . $breakOut),
                         ]);

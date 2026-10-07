@@ -78,13 +78,14 @@ class No11_UserAttendanceCorrectionTest extends TestCase
 
     public function test_修正申請処理が実行される()
     {
+        $this->withoutExceptionHandling();
         $user = User::factory()->create(['role' => 'user']);
         $admin = User::factory()->create(['role' => 'admin']);
         $attendanceRecord = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '出勤中',]);
 
         $this->actingAs($user)->post("/attendance/{$attendanceRecord->id}", [
-            'clock_in' => '2026-10-07 08:30:00',
-            'clock_out' => '2026-10-07 17:30:00',
+            'clock_in' => '08:30',
+            'clock_out' => '17:30',
             'comment' => '電車遅延のため修正',
         ]);
 

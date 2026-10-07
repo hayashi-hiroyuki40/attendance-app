@@ -34,7 +34,7 @@ class AttendanceCorrectionFactory extends Factory
     public function approved(): static
     {
         return $this->state(fn(array $attributes) => [
-            'status' => 'approved',
+            'status' => '承認済み',
         ]);
     }
 }

@@ -23,21 +23,21 @@ class AttendanceCorrectionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'new_clock_in' => ['required'],
-            'new_clock_out' => ['required', 'after:new_clock_in'],
-            'new_break_in' => ['nullable', 'array'],
-            'new_break_in.*' => [
+            'clock_in' => ['required'],
+            'clock_out' => ['required', 'after:clock_in'],
+            'break_in' => ['nullable', 'array'],
+            'break_in.*' => [
                 'nullable',
-                'required_with:new_break_out.*',
-                'after_or_equal:new_clock_in',
-                'before_or_equal:new_clock_out',
+                'required_with:break_out.*',
+                'after_or_equal:clock_in',
+                'before_or_equal:clock_out',
             ],
-            'new_break_out' => ['nullable', 'array'],
-            'new_break_out.*' => [
+            'break_out' => ['nullable', 'array'],
+            'break_out.*' => [
                 'nullable',
-                'required_with:new_break_in.*',
-                'after:new_break_in.*',
-                'before_or_equal:new_clock_out',
+                'required_with:break_in.*',
+                'after:break_in.*',
+                'before_or_equal:clock_out',
             ],
             'comment' => ['required', 'string'],
         ];
@@ -46,17 +46,17 @@ class AttendanceCorrectionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'new_clock_in.required' => '出勤時間を入力してください',
-            'new_clock_out.required' => '退勤時間を入力してください',
-            'new_clock_out.after' => '出勤時間が不適切な値です',
+            'clock_in.required' => '出勤時間を入力してください',
+            'clock_out.required' => '退勤時間を入力してください',
+            'clock_out.after' => '出勤時間が不適切な値です',
 
-            'new_break_in.*.required_with' => '休憩時間を入力してください',
-            'new_break_in.*.after_or_equal' => '休憩時間が不適切な値です',
-            'new_break_in.*.before_or_equal' => '休憩時間が不適切な値です',
+            'break_in.*.required_with' => '休憩時間を入力してください',
+            'break_in.*.after_or_equal' => '休憩時間が不適切な値です',
+            'break_in.*.before_or_equal' => '休憩時間が不適切な値です',
 
-            'new_break_out.*.required_with' => '休憩時間を入力してください',
-            'new_break_out.*.after' => '休憩時間が不適切な値です',
-            'new_break_out.*.before_or_equal' => '休憩時間もしくは退勤時間が不適切な値です',
+            'break_out.*.required_with' => '休憩時間を入力してください',
+            'break_out.*.after' => '休憩時間が不適切な値です',
+            'break_out.*.before_or_equal' => '休憩時間もしくは退勤時間が不適切な値です',
 
             'comment.required' => '備考を記入してください',
         ];

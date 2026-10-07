@@ -20,14 +20,14 @@ class AttendanceRecordController extends Controller
         $formattedTime = $now->format('H:i');
 
         $attendance = AttendanceRecord::where('user_id', $user->id)
-            ->where('date', $today)
+            ->whereDate('date', $today)
             ->first();
 
         $attendanceStatus = $attendance ? $attendance->status : '勤務外';
 
         $user->attendance_status = $attendanceStatus;
 
-        return view('attendance.register', compact('user', 'formattedDate', 'formattedTime'));
+        return view('user.attendance-register', compact('user', 'formattedDate', 'formattedTime'));
     }
 
     public function store(Request $request)
@@ -37,7 +37,7 @@ class AttendanceRecordController extends Controller
         $now = Carbon::now();
 
         $attendance = AttendanceRecord::where('user_id', $user->id)
-            ->where('date', $today)
+            ->whereDate('date', $today)
             ->first();
 
         $currentStatus = $attendance ? $attendance->status : '勤務外';

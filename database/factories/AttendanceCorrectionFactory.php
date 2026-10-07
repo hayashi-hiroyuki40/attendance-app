@@ -26,14 +26,14 @@ class AttendanceCorrectionFactory extends Factory
             'user_id' => User::factory(),
             'clock_in' => $date->format('Y-m-d 09:00:00'),
             'clock_out' => $date->format('Y-m-d 18:00:00'),
-            'reason' => fake()->realText(15),
-            'status' => 'pending',
+            'comment' => fake()->realText(15),
+            'status' => '承認待ち',
         ];
     }
 
     public function approved(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'status' => 'approved',
         ]);
     }

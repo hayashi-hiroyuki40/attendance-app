@@ -19,21 +19,21 @@ class UserSeeder extends Seeder
                 'email' => 'user1@example.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'role' => 'user',
+                'admin_status' => false,
             ],
             [
                 'name' => 'ユーザー2',
                 'email' => 'user2@example.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'role' => 'user',
+                'admin_status' => false,
             ],
             [
                 'name' => 'ユーザー3',
                 'email' => 'user3@example.com',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'role' => 'admin',
+                'admin_status' => true,
             ],
         ];
 

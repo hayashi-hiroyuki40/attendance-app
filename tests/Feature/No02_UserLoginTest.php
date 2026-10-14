@@ -12,7 +12,7 @@ class No02_UserLoginTest extends TestCase
 
     public function test_メールアドレスが未入力の場合_バリデーションメッセージが表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
         $response = $this->post('/login', [
             'password' => 'password',
@@ -25,7 +25,7 @@ class No02_UserLoginTest extends TestCase
 
     public function test_パスワードが未入力の場合_バリデーションメッセージが表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
         $response = $this->post('/login', [
             'email' => $user->email,
@@ -38,7 +38,7 @@ class No02_UserLoginTest extends TestCase
 
     public function test_登録内容と一致しない場合_バリデーションメッセージが表示される()
     {
-        User::factory()->create(['role' => 'user', 'email' => 'this@example.com']);
+        User::factory()->create(['admin_status' => false, 'email' => 'this@example.com']);
 
         $response = $this->post('/login', [
             'email' => 'wrong@example.com',

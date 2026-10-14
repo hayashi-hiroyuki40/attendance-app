@@ -10,7 +10,7 @@ class LoginResponse implements LoginResponseContract
     {
         $user = auth()->user();
 
-        if ($user->role) {
+        if ($user->admin_status) {
             return redirect()->intended('/admin/attendance/list');
         }
 

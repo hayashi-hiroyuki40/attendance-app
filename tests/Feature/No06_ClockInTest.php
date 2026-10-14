@@ -13,7 +13,7 @@ class No06_ClockInTest extends TestCase
 
     public function test_出勤ボタンが正しく機能する()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
         $response = $this->actingAs($user)->get('/attendance');
         $response->assertSee('出勤');
@@ -28,7 +28,7 @@ class No06_ClockInTest extends TestCase
 
     public function test_出勤は一日一回のみできる()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'date' => now()->toDateString(),
@@ -44,11 +44,15 @@ class No06_ClockInTest extends TestCase
 
     public function test_出勤時刻が勤怠一覧画面で確認できる()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
-        $this->actingAs($user)->post('/attendance');
+        $this->actingAs($user)->post('/attendance', [
+            'action' => 'clock_in',
+        ]);
 
-        $response = $this->get('/attendance/list');
+        $response = $this->actingAs($user)->get('/attendance/list');
+
+        $response->assertStatus(200);
 
         $response->assertSee(now()->format('H:i'));
     }

@@ -7,18 +7,18 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class staffAttendanceController extends Controller
+class StaffAttendanceController extends Controller
 {
     public function index()
     {
-        $users = User::where('role', 'user')->get();
+        $users = User::where('admin_status', false)->get();
 
         return view('admin.staff-list', compact('users'));
     }
 
     public function show(Request $request, int $id)
     {
-        $user = User::where('role', 'user')->findOrFail($id);
+        $user = User::where('admin_status', false)->findOrFail($id);
 
         $date = $request->query('date') ? Carbon::parse($request->query('date')) : Carbon::now();
         $previousMonth = $date->copy()->subMonth()->format('Y-m');

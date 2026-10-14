@@ -14,7 +14,7 @@ class No08_ClockOutTest extends TestCase
 
     public function test_退勤ボタンが正しく機能する()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '出勤中',
@@ -34,7 +34,7 @@ class No08_ClockOutTest extends TestCase
     {
         Carbon::setTestNow('2026-09-30 09:00:00');
 
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
         $this->actingAs($user)->post('/attendance', [
             'action' => 'clock_in',

@@ -86,7 +86,6 @@ class No01_RegisterTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
-            'role' => 'user',
         ]);
     }
 }

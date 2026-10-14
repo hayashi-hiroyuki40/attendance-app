@@ -14,7 +14,7 @@ class No05_AttendanceStatusTest extends TestCase
 
     public function test_勤務外の場合_勤怠ステータスが正しく表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
         $response = $this->actingAs($user)->get('/attendance');
 
@@ -23,7 +23,7 @@ class No05_AttendanceStatusTest extends TestCase
 
     public function test_出勤中の場合_勤怠ステータスが正しく表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '出勤中',
@@ -38,7 +38,7 @@ class No05_AttendanceStatusTest extends TestCase
 
     public function test_休憩中の場合_勤怠ステータスが正しく表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '休憩中',
@@ -53,7 +53,7 @@ class No05_AttendanceStatusTest extends TestCase
 
     public function test_退勤済の場合_勤怠ステータスが正しく表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '退勤済',

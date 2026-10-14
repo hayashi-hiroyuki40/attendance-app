@@ -14,7 +14,7 @@ class No10_UserAttendanceDetailTest extends TestCase
 
     public function test_勤怠詳細画面の「名前」がログインユーザーの氏名になっている()
     {
-        $user = User::factory()->create(['name' => '山田太郎', 'role' => 'user']);
+        $user = User::factory()->create(['name' => '山田太郎', 'admin_status' => false]);
         $record = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '出勤中']);
 
         $response = $this->actingAs($user)->get("/attendance/{$record->id}");
@@ -24,7 +24,7 @@ class No10_UserAttendanceDetailTest extends TestCase
 
     public function test_勤怠詳細画面の「日付」が選択した日付になっている()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         $record = AttendanceRecord::factory()->create(['user_id' => $user->id, 'date' => '2026-09-30', 'status' => '出勤中']);
 
         $response = $this->actingAs($user)->get("/attendance/{$record->id}");
@@ -35,7 +35,7 @@ class No10_UserAttendanceDetailTest extends TestCase
 
     public function test_出勤・退勤にて記されている時間がログインユーザーの打刻と一致している()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         $record = AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'clock_in' => '2026-09-30 09:00:00',
@@ -50,7 +50,7 @@ class No10_UserAttendanceDetailTest extends TestCase
 
     public function test_休憩にて記されている時間がログインユーザーの打刻と一致している()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         $record = AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'date' => '2026-06-19',

@@ -11,26 +11,34 @@ class AdminCorrectionController extends Controller
 {
     public function index(Request $request)
     {
-        $status = $request->input('status', '承認待ち');
-
-        $applications = AttendanceCorrection::with(['user', 'AttendanceRecord'])
-            ->where('status', $status)
+        $applications = AttendanceCorrection::with(['user', 'attendanceRecord'])
             ->orderBy('created_at', 'desc')
             ->get();
+
+        $applications = $applications->map(function ($app) {
+            $record = $app->attendanceRecord ?? $app->AttendanceRecord;
+
+            $app->approval_status = $app->status;
+            $app->application_date = $app->created_at;
+
+            $app->AttendanceRecord = $record;
+
+            return $app;
+        });
 
         return view('admin.admin-application-list', compact('applications'));
     }
 
     public function show(int $id)
     {
-        $application = AttendanceCorrection::with(['user', 'AttendanceRecord', 'proposalBreaks'])
+        $application = AttendanceCorrection::with(['user', 'attendanceRecord', 'correctionBreaks'])
             ->findOrFail($id);
 
-        $recordDate = Carbon::parse($application->AttendanceRecord->date);
+        $recordDate = Carbon::parse($application->attendanceRecord->date);
         $application->new_date = $recordDate;
         $application->new_clock_in = $application->clock_in ? Carbon::parse($application->clock_in)->format('H:i') : '';
         $application->new_clock_out = $application->clock_out ? Carbon::parse($application->clock_out)->format('H:i') : '';
-        $application->approval_status = $application->status; // '承認待ち' または '承認済み'
+        $application->approval_status = $application->status;
 
         $user = $application->user;
 
@@ -39,7 +47,7 @@ class AdminCorrectionController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $application = AttendanceCorrection::with(['AttendanceRecord', 'proposalBreaks'])
+        $application = AttendanceCorrection::with(['attendanceRecord', 'correctionBreaks'])
             ->findOrFail($id);
 
         DB::transaction(function () use ($application) {
@@ -54,7 +62,8 @@ class AdminCorrectionController extends Controller
             ]);
 
             $record->attendanceBreaks()->delete();
-            foreach ($application->proposalBreaks as $break) {
+
+            foreach ($application->correctionBreaks as $break) {
                 $record->attendanceBreaks()->create([
                     'break_in' => $break->break_in,
                     'break_out' => $break->break_out,

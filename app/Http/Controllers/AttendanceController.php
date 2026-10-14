@@ -61,7 +61,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
 
-        $record = AttendanceRecord::with(['attendanceBreaks', 'attendanceCorrections' => fn($q) => $q->where('status', '承認待ち')->with('correctionBreaks')])
+        $record = AttendanceRecord::with(['attendanceBreaks', 'attendanceCorrections' => fn ($q) => $q->where('status', '承認待ち')->with('correctionBreaks')])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 
@@ -77,7 +77,7 @@ class AttendanceController extends Controller
                 'clock_out' => $pendingCorrection->clock_out ? Carbon::parse($pendingCorrection->clock_out)->format('H:i') : '',
                 'comment' => $pendingCorrection->comment ?? '',
                 'application' => $pendingCorrection,
-                'breaks' => $pendingCorrection->correctionBreaks->map(fn($b) => [
+                'breaks' => $pendingCorrection->correctionBreaks->map(fn ($b) => [
                     'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
                     'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
                 ])->toArray(),
@@ -94,16 +94,16 @@ class AttendanceController extends Controller
 
                 foreach ($oldBreakIns as $index => $breakIn) {
                     $breaks[] = [
-                        'break_in'  => $breakIn ?? '',
+                        'break_in' => $breakIn ?? '',
                         'break_out' => $oldBreakOuts[$index] ?? '',
                     ];
                 }
 
-                if (!empty($breaks) && end($breaks)['break_in'] === '' && end($breaks)['break_out'] === '') {
+                if (! empty($breaks) && end($breaks)['break_in'] === '' && end($breaks)['break_out'] === '') {
                     array_pop($breaks);
                 }
             } else {
-                $breaks = $record->attendanceBreaks->map(fn($b) => [
+                $breaks = $record->attendanceBreaks->map(fn ($b) => [
                     'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
                     'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
                 ])->toArray();
@@ -137,19 +137,19 @@ class AttendanceController extends Controller
         DB::transaction(function () use ($validated, $record) {
             $dateStr = Carbon::parse($record->date)->format('Y-m-d');
 
-            $clockIn  = $validated['new_clock_in'];
+            $clockIn = $validated['new_clock_in'];
             $clockOut = $validated['new_clock_out'];
 
             $correction = AttendanceCorrection::create([
                 'attendance_record_id' => $record->id,
                 'user_id' => Auth::id(),
-                'clock_in' => Carbon::parse($dateStr . ' ' . $clockIn),
-                'clock_out' => Carbon::parse($dateStr . ' ' . $clockOut),
+                'clock_in' => Carbon::parse($dateStr.' '.$clockIn),
+                'clock_out' => Carbon::parse($dateStr.' '.$clockOut),
                 'comment' => $validated['comment'],
                 'status' => '承認待ち',
             ]);
 
-            $breakIns  = $validated['new_break_in']  ?? [];
+            $breakIns = $validated['new_break_in'] ?? [];
             $breakOuts = $validated['new_break_out'] ?? [];
 
             if (! empty($breakIns) && is_array($breakIns)) {
@@ -159,8 +159,8 @@ class AttendanceController extends Controller
                     if (! empty($breakIn) && ! empty($breakOut)) {
                         CorrectionBreak::create([
                             'attendance_correction_id' => $correction->id,
-                            'break_in' => Carbon::parse($dateStr . ' ' . $breakIn),
-                            'break_out' => Carbon::parse($dateStr . ' ' . $breakOut),
+                            'break_in' => Carbon::parse($dateStr.' '.$breakIn),
+                            'break_out' => Carbon::parse($dateStr.' '.$breakOut),
                         ]);
                     }
                 }

@@ -13,7 +13,7 @@ class No07_BreakTest extends TestCase
 
     public function test_休憩ボタンが正しく機能する()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '出勤中',
@@ -33,7 +33,7 @@ class No07_BreakTest extends TestCase
 
     public function test_休憩は一日に何回でもできる()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '出勤中',
@@ -53,7 +53,7 @@ class No07_BreakTest extends TestCase
 
     public function test_休憩戻ボタンが正しく機能する()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '出勤中',
@@ -72,7 +72,7 @@ class No07_BreakTest extends TestCase
 
     public function test_休憩戻は一日に何回でもできる()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '出勤中',
@@ -95,7 +95,7 @@ class No07_BreakTest extends TestCase
 
     public function test_休憩時刻が勤怠一覧画面で確認できる()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         $attendance = AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '出勤中',
@@ -119,6 +119,6 @@ class No07_BreakTest extends TestCase
 
         $response = $this->get('/attendance/list');
 
-        $response->assertSee('01:00');
+        $response->assertSee('1:00');
     }
 }

@@ -13,7 +13,7 @@ class No04_CurrentDateTimeTest extends TestCase
 
     public function test_現在の日時情報が_u_iと同じ形式で出力されている()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         Carbon::setTestNow('2026-09-30 10:00:00');
 
         $response = $this->actingAs($user)->get('/attendance');

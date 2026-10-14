@@ -12,7 +12,7 @@ class No03_AdminLoginTest extends TestCase
 
     public function test_メールアドレスが未入力の場合_バリデーションメッセージが表示される()
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['admin_status' => true]);
 
         $response = $this->post('/admin/login', [
             'password' => 'password',
@@ -25,7 +25,7 @@ class No03_AdminLoginTest extends TestCase
 
     public function test_パスワードが未入力の場合_バリデーションメッセージが表示される()
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['admin_status' => true]);
 
         $response = $this->post('/admin/login', [
             'email' => $admin->email,
@@ -38,7 +38,7 @@ class No03_AdminLoginTest extends TestCase
 
     public function test_登録内容と一致しない場合_バリデーションメッセージが表示される()
     {
-        User::factory()->create(['role' => 'admin', 'email' => 'admin@example.com']);
+        User::factory()->create(['admin_status' => true, 'email' => 'admin@example.com']);
 
         $response = $this->post('/admin/login', [
             'email' => 'wrong@example.com',

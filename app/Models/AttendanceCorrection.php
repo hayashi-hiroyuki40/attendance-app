@@ -32,4 +32,9 @@ class AttendanceCorrection extends Model
     {
         return $this->hasMany(CorrectionBreak::class, 'attendance_correction_id');
     }
+
+    public function proposalBreaks()
+    {
+        return $this->correctionBreaks();
+    }
 }

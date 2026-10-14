@@ -13,12 +13,11 @@ class CheckRole
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $adminController, string $method = 'index'): Response
+    public function handle(Request $request, Closure $next, string $adminCorrectionController, string $method = 'index')
     {
-        if ($request->user()?->is_admin) {
-            $controllerClass = "App\\Http\\Controllers\\{$adminController}";
-
-            return app()->call([app($controllerClass), $method], ['request' => $request]);
+        if ($request->user() && $request->user()->admin_status) {
+            $request->route()->controllerClass = "App\\Http\\Controllers\\{$adminCorrectionController}";
+            $request->route()->uses = "App\\Http\\Controllers\\{$adminCorrectionController}@{$method}";
         }
 
         return $next($request);

@@ -37,7 +37,7 @@ class AdminAttendanceController extends Controller
             'clock_in' => $record->clock_in ? Carbon::parse($record->clock_in)->format('H:i') : '',
             'clock_out' => $record->clock_out ? Carbon::parse($record->clock_out)->format('H:i') : '',
             'comment' => '',
-            'breaks' => $record->attendanceBreaks->map(fn($b) => [
+            'breaks' => $record->attendanceBreaks->map(fn ($b) => [
                 'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
                 'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
             ])->toArray(),
@@ -60,9 +60,9 @@ class AdminAttendanceController extends Controller
             $dateStr = Carbon::parse($record->date)->format('Y-m-d');
 
             $record->update([
-                'clock_in' => Carbon::parse($dateStr . ' ' . $validated['new_clock_in']),
-                'clock_out' => Carbon::parse($dateStr . ' ' . $validated['new_clock_out']),
-                'comment'   => $validated['comment'] ?? '',
+                'clock_in' => Carbon::parse($dateStr.' '.$validated['new_clock_in']),
+                'clock_out' => Carbon::parse($dateStr.' '.$validated['new_clock_out']),
+                'comment' => $validated['comment'] ?? '',
             ]);
 
             $record->attendanceBreaks()->delete();
@@ -73,14 +73,14 @@ class AdminAttendanceController extends Controller
 
                     if (! empty($breakIn) && ! empty($breakOut)) {
                         $record->attendanceBreaks()->create([
-                            'break_in' => Carbon::parse($dateStr . ' ' . $breakIn),
-                            'break_out' => Carbon::parse($dateStr . ' ' . $breakOut),
+                            'break_in' => Carbon::parse($dateStr.' '.$breakIn),
+                            'break_out' => Carbon::parse($dateStr.' '.$breakOut),
                         ]);
                     }
                 }
             }
         });
 
-        return redirect('/attendance/' . $id);
+        return redirect('/attendance/'.$id);
     }
 }

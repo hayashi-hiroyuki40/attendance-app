@@ -15,7 +15,7 @@ class No09_UserAttendanceListTest extends TestCase
 
     public function test_自分が行った勤怠情報が全て表示されている()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         $record = AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'status' => '出勤中',
@@ -43,7 +43,7 @@ class No09_UserAttendanceListTest extends TestCase
 
     public function test_勤怠一覧画面に遷移した際に現在の月が表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
         $response = $this->actingAs($user)->get('/attendance/list');
 
@@ -52,7 +52,7 @@ class No09_UserAttendanceListTest extends TestCase
 
     public function test_前月を押下した時に表示月の前月の情報が表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
         $response = $this->actingAs($user)->get('/attendance/list?month='.now()->subMonth()->format('Y-m'));
 
@@ -61,7 +61,7 @@ class No09_UserAttendanceListTest extends TestCase
 
     public function test_翌月を押下した時に表示月の前月の情報が表示される()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
 
         $response = $this->actingAs($user)->get('/attendance/list?month='.now()->addMonth()->format('Y-m'));
 
@@ -70,7 +70,7 @@ class No09_UserAttendanceListTest extends TestCase
 
     public function test_詳細を押下するとその日の勤怠詳細画面に遷移する()
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create(['admin_status' => false]);
         $record = AttendanceRecord::factory()->create([
             'user_id' => $user->id,
             'date' => today(),

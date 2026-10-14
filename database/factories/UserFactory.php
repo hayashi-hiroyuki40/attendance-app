@@ -30,7 +30,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => 'user',
+            'admin_status' => false,
         ];
     }
 
@@ -40,7 +40,7 @@ class UserFactory extends Factory
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'admin',
+            'admin_status' => true,
         ]);
     }
 }

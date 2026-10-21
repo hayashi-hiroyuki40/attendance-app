@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\AttendanceReportController;
 
 Route::middleware(['web'])->group(function () {
     Route::get('/admin/login', [AuthenticatedSessionController::class, 'create']);
@@ -20,6 +21,9 @@ Route::middleware(['web'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/attendance', [AttendanceRecordController::class, 'index'])->middleware(['verified']);
     Route::post('/attendance', [AttendanceRecordController::class, 'store']);
+
+    Route::get('/attendance/report', [AttendanceReportController::class, 'show']);
+
 
     Route::get('/attendance/list', [AttendanceController::class, 'index']);
     Route::get('/attendance/{id}', function (Request $request, int $id) {

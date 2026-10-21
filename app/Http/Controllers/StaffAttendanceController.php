@@ -6,6 +6,7 @@ use App\Models\AttendanceRecord;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StaffAttendanceController extends Controller
 {
@@ -61,5 +62,47 @@ class StaffAttendanceController extends Controller
             'nextMonth',
             'formattedAttendanceRecords'
         ));
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $userId = $request->input('user_id');
+        $date = Carbon::parse(str_replace('/', '-', $request->input('year_month')));
+
+        $records = AttendanceRecord::with('attendanceBreaks')
+            ->where('user_id', $userId)
+            ->whereYear('date', $date->year)
+            ->whereMonth('date', $date->month)
+            ->orderBy('date')
+            ->get();
+
+        $fileName = "attendance_{$userId}_{$date->format('Y-m')}.csv";
+
+        return new StreamedResponse(function () use ($records) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($handle, ['日付', '出勤', '退勤', '休憩', '合計']);
+
+            $records->map(function ($r) {
+                $breakMins = $r->attendanceBreaks->sum(
+                    fn($b) =>
+                    $b->break_in && $b->break_out ? Carbon::parse($b->break_in)->diffInMinutes(Carbon::parse($b->break_out)) : 0
+                );
+
+                $workMins = ($r->clock_in && $r->clock_out)
+                    ? Carbon::parse($r->clock_in)->diffInMinutes(Carbon::parse($r->clock_out)) - $breakMins
+                    : 0;
+
+                return [
+                    $r->date,
+                    $r->clock_in ? Carbon::parse($r->clock_in)->format('G:i') : '',
+                    $r->clock_out ? Carbon::parse($r->clock_out)->format('G:i') : '',
+                    $breakMins ? sprintf('%d:%02d', intdiv($breakMins, 60), $breakMins % 60) : '',
+                    $workMins > 0 ? sprintf('%d:%02d', intdiv($workMins, 60), $workMins % 60) : '',
+                ];
+            })->each(fn($row) => fputcsv($handle, $row));
+
+            fclose($handle);
+        }, 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => "attachment; filename=\"{$fileName}\""]);
     }
 }

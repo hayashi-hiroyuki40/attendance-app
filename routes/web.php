@@ -10,6 +10,7 @@ use App\Http\Requests\AttendanceCorrectionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 
 Route::middleware(['web'])->group(function () {
     Route::get('/admin/login', [AuthenticatedSessionController::class, 'create']);
@@ -17,7 +18,7 @@ Route::middleware(['web'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/attendance', [AttendanceRecordController::class, 'index']);
+    Route::get('/attendance', [AttendanceRecordController::class, 'index'])->middleware(['verified']);
     Route::post('/attendance', [AttendanceRecordController::class, 'store']);
 
     Route::get('/attendance/list', [AttendanceController::class, 'index']);
@@ -51,6 +52,15 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/application/{id}', [AttendanceCorrectionController::class, 'show']);
+
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
+        ->name('verification.notice');
+
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->name('verification.verify');
+
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+        ->name('verification.send');
 });
 
 Route::middleware(['auth', 'can:admin'])->group(function () {
@@ -62,4 +72,6 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::get('/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminCorrectionController::class, 'show']);
 
     Route::post('/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminCorrectionController::class, 'update']);
+
+    Route::post('/export', [AttendanceController::class, 'exportCsv']);
 });

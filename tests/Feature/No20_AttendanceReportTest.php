@@ -2,13 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\AttendanceRecord;
 use App\Models\AttendanceBreak;
+use App\Models\AttendanceRecord;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class No20_AttendanceReportTest extends TestCase
 {
@@ -26,8 +25,8 @@ class No20_AttendanceReportTest extends TestCase
         $user = User::factory()->create();
 
         $targetDate = Carbon::now()->startOfMonth()->toDateString();
-        $clockIn = Carbon::parse($targetDate . ' 09:15:00');
-        $clockOut = Carbon::parse($targetDate . ' 19:15:00');
+        $clockIn = Carbon::parse($targetDate.' 09:15:00');
+        $clockOut = Carbon::parse($targetDate.' 19:15:00');
 
         $record = AttendanceRecord::create([
             'user_id' => $user->id,
@@ -39,8 +38,8 @@ class No20_AttendanceReportTest extends TestCase
 
         AttendanceBreak::create([
             'attendance_record_id' => $record->id,
-            'break_in' => Carbon::parse($targetDate . ' 12:00:00'),
-            'break_out' => Carbon::parse($targetDate . ' 13:00:00'),
+            'break_in' => Carbon::parse($targetDate.' 12:00:00'),
+            'break_out' => Carbon::parse($targetDate.' 13:00:00'),
         ]);
 
         $response = $this->actingAs($user)->get('/attendance/report');

@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use App\Models\User;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
+use Tests\TestCase;
 
 class No16_EmailVerificationTest extends TestCase
 {
@@ -43,7 +43,7 @@ class No16_EmailVerificationTest extends TestCase
         $response = $this->actingAs($user)->get('/email/verify');
         $response->assertStatus(200);
 
-        $verificationUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
             ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
@@ -61,7 +61,7 @@ class No16_EmailVerificationTest extends TestCase
             'admin_status' => false,
         ]);
 
-        $verificationUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
             ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]

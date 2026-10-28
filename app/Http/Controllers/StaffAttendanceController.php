@@ -80,13 +80,12 @@ class StaffAttendanceController extends Controller
 
         return new StreamedResponse(function () use ($records) {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($handle, ['日付', '出勤', '退勤', '休憩', '合計']);
 
             $records->map(function ($r) {
                 $breakMins = $r->attendanceBreaks->sum(
-                    fn($b) =>
-                    $b->break_in && $b->break_out ? Carbon::parse($b->break_in)->diffInMinutes(Carbon::parse($b->break_out)) : 0
+                    fn ($b) => $b->break_in && $b->break_out ? Carbon::parse($b->break_in)->diffInMinutes(Carbon::parse($b->break_out)) : 0
                 );
 
                 $workMins = ($r->clock_in && $r->clock_out)
@@ -100,7 +99,7 @@ class StaffAttendanceController extends Controller
                     $breakMins ? sprintf('%d:%02d', intdiv($breakMins, 60), $breakMins % 60) : '',
                     $workMins > 0 ? sprintf('%d:%02d', intdiv($workMins, 60), $workMins % 60) : '',
                 ];
-            })->each(fn($row) => fputcsv($handle, $row));
+            })->each(fn ($row) => fputcsv($handle, $row));
 
             fclose($handle);
         }, 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => "attachment; filename=\"{$fileName}\""]);

@@ -5,12 +5,13 @@ use App\Http\Controllers\AdminCorrectionController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionController;
 use App\Http\Controllers\AttendanceRecordController;
+use App\Http\Controllers\AttendanceReportController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\StaffAttendanceController;
 use App\Http\Requests\AttendanceCorrectionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\EmailVerificationController;
 
 Route::middleware(['web'])->group(function () {
     Route::get('/admin/login', [AuthenticatedSessionController::class, 'create']);
@@ -20,6 +21,8 @@ Route::middleware(['web'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/attendance', [AttendanceRecordController::class, 'index'])->middleware(['verified']);
     Route::post('/attendance', [AttendanceRecordController::class, 'store']);
+
+    Route::get('/attendance/report', [AttendanceReportController::class, 'show']);
 
     Route::get('/attendance/list', [AttendanceController::class, 'index']);
     Route::get('/attendance/{id}', function (Request $request, int $id) {

@@ -17,7 +17,8 @@ return new class extends Migration
             $table->date('date');
             $table->dateTime('clock_in');
             $table->dateTime('clock_out')->nullable();
-            $table->enum('status', ['勤務外', '出勤中', '休憩中', '退勤済']);
+            $table->text('comment')->nullable();
+            $table->enum('status', ['勤務外', '出勤中', '休憩中', '退勤済'])->nullable();
             $table->timestamps();
         });
     }

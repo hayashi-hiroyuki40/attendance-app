@@ -6,12 +6,14 @@ use App\Http\Requests\Admin\UpdateAttendanceRequest;
 use App\Models\AttendanceRecord;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class AdminAttendanceController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $date = $request->query('date') ? Carbon::parse($request->query('date')) : Carbon::today();
         $previousDay = $date->copy()->subDay()->format('Y-m-d');
@@ -23,7 +25,7 @@ class AdminAttendanceController extends Controller
         return view('admin.admin-attendance-list', compact('date', 'previousDay', 'nextDay', 'users', 'attendanceRecords'));
     }
 
-    public function show(int $id)
+    public function show(int $id): View
     {
         $record = AttendanceRecord::with(['user', 'attendanceBreaks', 'attendanceCorrections'])->findOrFail($id);
 
@@ -46,7 +48,7 @@ class AdminAttendanceController extends Controller
         return view('admin.admin-detail', compact('user', 'attendanceRecord'));
     }
 
-    public function update(UpdateAttendanceRequest $request, int $id)
+    public function update(UpdateAttendanceRequest $request, int $id): RedirectResponse
     {
         $validated = $request->validated();
 

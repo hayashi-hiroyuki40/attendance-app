@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CorrectionBreak extends Model
 {
@@ -15,7 +16,7 @@ class CorrectionBreak extends Model
         'break_out',
     ];
 
-    public function attendanceCorrection()
+    public function attendanceCorrection(): BelongsTo
     {
         return $this->belongsTo(AttendanceCorrection::class);
     }

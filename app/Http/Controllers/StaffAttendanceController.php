@@ -6,22 +6,30 @@ use App\Models\AttendanceRecord;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StaffAttendanceController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $users = User::where('admin_status', false)->get();
 
         return view('admin.staff-list', compact('users'));
     }
 
-    public function show(Request $request, int $id)
+    public function show(Request $request, int $id): View
     {
         $user = User::where('admin_status', false)->findOrFail($id);
 
-        $date = $request->query('date') ? Carbon::parse($request->query('date')) : Carbon::now();
+        $dateParam = $request->query('month') ?? $request->query('date');
+
+        if ($dateParam) {
+            $date = Carbon::parse($dateParam);
+        } else {
+            $latestRecord = AttendanceRecord::where('user_id', $user->id)->latest('date')->first();
+            $date = $latestRecord ? Carbon::parse($latestRecord->date) : Carbon::now();
+        }
         $previousMonth = $date->copy()->subMonth()->format('Y-m');
         $nextMonth = $date->copy()->addMonth()->format('Y-m');
 
@@ -64,7 +72,7 @@ class StaffAttendanceController extends Controller
         ));
     }
 
-    public function exportCsv(Request $request)
+    public function exportCsv(Request $request): StreamedResponse
     {
         $userId = $request->input('user_id');
         $date = Carbon::parse(str_replace('/', '-', $request->input('year_month')));

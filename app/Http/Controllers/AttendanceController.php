@@ -7,13 +7,15 @@ use App\Models\AttendanceCorrection;
 use App\Models\AttendanceRecord;
 use App\Models\CorrectionBreak;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class AttendanceController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $user = Auth::user();
 
@@ -57,7 +59,7 @@ class AttendanceController extends Controller
         return view('user.user-attendance-list', compact('date', 'previousMonth', 'nextMonth', 'formattedAttendanceRecords'));
     }
 
-    public function show(int $id)
+    public function show(int $id): View
     {
         $user = Auth::user();
 
@@ -124,7 +126,7 @@ class AttendanceController extends Controller
         return view('user.user-detail', compact('user', 'data'));
     }
 
-    public function store(AttendanceCorrectionRequest $request, int $id)
+    public function store(AttendanceCorrectionRequest $request, int $id): RedirectResponse
     {
         $validated = $request->validated();
 

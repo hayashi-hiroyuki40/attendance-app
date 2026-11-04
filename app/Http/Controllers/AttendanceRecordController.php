@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceRecord;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AttendanceRecordController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $user = Auth::user();
         $now = Carbon::now();
@@ -30,7 +32,7 @@ class AttendanceRecordController extends Controller
         return view('user.attendance-register', compact('user', 'formattedDate', 'formattedTime'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $user = Auth::user();
         $today = Carbon::today();

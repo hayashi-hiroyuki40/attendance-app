@@ -37,7 +37,7 @@ class AttendanceCorrectionRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation()
+    protected function prepareForValidation(): void
     {
         $this->merge([
             'new_break_in' => array_map(fn ($v) => $v === '' ? null : $v, $this->input('new_break_in', [])),
@@ -45,7 +45,7 @@ class AttendanceCorrectionRequest extends FormRequest
         ]);
     }
 
-    public function withValidator($validator)
+    public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
             $clockInStr = $this->input('new_clock_in');

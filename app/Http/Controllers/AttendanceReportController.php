@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\AttendanceRecord;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AttendanceReportController extends Controller
 {
-    public function show(Request $request)
+    public function show(Request $request): View
     {
         $now = Carbon::now();
         $currentMonth = $now->format('Y-m');

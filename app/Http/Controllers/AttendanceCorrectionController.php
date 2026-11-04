@@ -6,10 +6,11 @@ use App\Models\AttendanceCorrection;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AttendanceCorrectionController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $loginUser = Auth::user();
 
@@ -43,7 +44,7 @@ class AttendanceCorrectionController extends Controller
         return view('user.user-application-list', compact('formattedApplications', 'user', 'tab'));
     }
 
-    public function show($id)
+    public function show($id): View
     {
         $application = AttendanceCorrection::with(['user', 'attendanceRecord', 'correctionBreaks'])->findOrFail($id);
 

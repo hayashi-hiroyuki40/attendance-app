@@ -10,11 +10,13 @@ class AttendanceRecordPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function before(User $user, string $ability)
+    public function before(User $user, string $ability): ?bool
     {
         if ($user->admin_status === 'true') {
             return true;
         }
+
+        return null;
     }
 
     public function update(User $user, AttendanceRecord $attendanceRecord): bool

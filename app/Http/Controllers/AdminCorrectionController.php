@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\AttendanceCorrection;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class AdminCorrectionController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $applications = AttendanceCorrection::with(['user', 'attendanceRecord'])
             ->orderBy('created_at', 'desc')
@@ -29,7 +31,7 @@ class AdminCorrectionController extends Controller
         return view('admin.admin-application-list', compact('applications'));
     }
 
-    public function show(int $id)
+    public function show(int $id): View
     {
         $application = AttendanceCorrection::with(['user', 'attendanceRecord', 'correctionBreaks'])
             ->findOrFail($id);
@@ -45,7 +47,7 @@ class AdminCorrectionController extends Controller
         return view('admin.admin-application-detail', compact('application', 'user'));
     }
 
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id): RedirectResponse
     {
         $application = AttendanceCorrection::with(['attendanceRecord', 'correctionBreaks'])
             ->findOrFail($id);

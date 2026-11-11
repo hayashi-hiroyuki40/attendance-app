@@ -6,12 +6,13 @@ use App\Models\AttendanceRecord;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Carbon\Carbon;
 
 class No14_AdminUserManageTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_管理者ユーザーが全一般ユーザーの氏名とメールアドレスを確認できる()
+    public function test_管理者ユーザーが全一般ユーザーの氏名とメールアドレスを確認できる(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user1 = User::factory()->create(['admin_status' => false, 'name' => 'ユーザー一号', 'email' => 'user1@example.com']);
@@ -24,7 +25,7 @@ class No14_AdminUserManageTest extends TestCase
             ->assertSee($user2->name)->assertSee($user2->email);
     }
 
-    public function test_ユーザーの勤怠情報が正しく表示される()
+    public function test_ユーザーの勤怠情報が正しく表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create([
@@ -34,7 +35,7 @@ class No14_AdminUserManageTest extends TestCase
 
         $attendanceRecord = AttendanceRecord::factory()->create([
             'user_id' => $user->id,
-            'date' => '2026-10-01',
+            'date' => Carbon::today()->toDateString(),
             'status' => '退勤済',
             'clock_in' => '09:00:00',
             'clock_out' => '18:00:00',
@@ -48,7 +49,7 @@ class No14_AdminUserManageTest extends TestCase
             ->assertSee('18:00');
     }
 
-    public function test_前月を押下した時に表示月の前月の情報が表示される()
+    public function test_前月を押下した時に表示月の前月の情報が表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false]);
@@ -59,7 +60,7 @@ class No14_AdminUserManageTest extends TestCase
             ->assertSee('2026-09');
     }
 
-    public function test_翌月を押下した時に表示月の翌月の情報が表示される()
+    public function test_翌月を押下した時に表示月の翌月の情報が表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false]);
@@ -70,7 +71,7 @@ class No14_AdminUserManageTest extends TestCase
             ->assertSee('2026-11');
     }
 
-    public function test_詳細を押下するとその日の勤怠詳細画面に遷移する()
+    public function test_詳細を押下するとその日の勤怠詳細画面に遷移する(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false]);

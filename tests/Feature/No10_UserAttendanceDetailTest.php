@@ -12,7 +12,7 @@ class No10_UserAttendanceDetailTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_勤怠詳細画面の「名前」がログインユーザーの氏名になっている()
+    public function test_勤怠詳細画面の「名前」がログインユーザーの氏名になっている(): void
     {
         $user = User::factory()->create(['name' => '山田太郎', 'admin_status' => false]);
         $record = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '出勤中']);
@@ -22,7 +22,7 @@ class No10_UserAttendanceDetailTest extends TestCase
         $response->assertSee('山田太郎');
     }
 
-    public function test_勤怠詳細画面の「日付」が選択した日付になっている()
+    public function test_勤怠詳細画面の「日付」が選択した日付になっている(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $record = AttendanceRecord::factory()->create(['user_id' => $user->id, 'date' => '2026-09-30', 'status' => '出勤中']);
@@ -33,7 +33,7 @@ class No10_UserAttendanceDetailTest extends TestCase
             ->assertSee('9月30日');
     }
 
-    public function test_出勤・退勤にて記されている時間がログインユーザーの打刻と一致している()
+    public function test_出勤・退勤にて記されている時間がログインユーザーの打刻と一致している(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $record = AttendanceRecord::factory()->create([
@@ -48,7 +48,7 @@ class No10_UserAttendanceDetailTest extends TestCase
         $response->assertSee('09:00')->assertSee('18:00');
     }
 
-    public function test_休憩にて記されている時間がログインユーザーの打刻と一致している()
+    public function test_休憩にて記されている時間がログインユーザーの打刻と一致している(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $record = AttendanceRecord::factory()->create([

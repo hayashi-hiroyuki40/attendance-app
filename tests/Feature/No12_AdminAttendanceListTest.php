@@ -12,7 +12,7 @@ class No12_AdminAttendanceListTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_その日になされた全ユーザーの勤怠情報が正確に確認できる()
+    public function test_その日になされた全ユーザーの勤怠情報が正確に確認できる(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user1 = User::factory()->create(['admin_status' => false, 'name' => 'テスト太郎']);
@@ -29,7 +29,7 @@ class No12_AdminAttendanceListTest extends TestCase
             ->assertSee('テスト花子');
     }
 
-    public function test_遷移した際に現在の日付が表示される()
+    public function test_遷移した際に現在の日付が表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $today = Carbon::today()->format('Y/m/d');
@@ -40,7 +40,7 @@ class No12_AdminAttendanceListTest extends TestCase
             ->assertSee($today);
     }
 
-    public function test_前日を押下した時に前の日の勤怠情報が表示される()
+    public function test_前日を押下した時に前の日の勤怠情報が表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $yesterday = Carbon::yesterday()->format('Y/m/d');
@@ -55,7 +55,7 @@ class No12_AdminAttendanceListTest extends TestCase
             ->assertSee($yesterday);
     }
 
-    public function test_翌日を押下した時に次の日の勤怠情報が表示される()
+    public function test_翌日を押下した時に次の日の勤怠情報が表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $tomorrow = Carbon::tomorrow()->format('Y/m/d');

@@ -12,7 +12,7 @@ class No11_UserAttendanceCorrectionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_出勤時間が退勤時間より後になっている場合、エラーメッセージが表示される()
+    public function test_出勤時間が退勤時間より後になっている場合、エラーメッセージが表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $attendanceRecord = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '退勤済']);
@@ -28,7 +28,7 @@ class No11_UserAttendanceCorrectionTest extends TestCase
         $response->assertSessionHasErrors(['new_clock_in' => '出勤時間もしくは退勤時間が不適切な値です']);
     }
 
-    public function test_休憩開始時間が退勤時間より後になっている場合、エラーメッセージが表示される()
+    public function test_休憩開始時間が退勤時間より後になっている場合、エラーメッセージが表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $attendanceRecord = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '退勤済']);
@@ -44,7 +44,7 @@ class No11_UserAttendanceCorrectionTest extends TestCase
         $response->assertSessionHasErrors(['new_break_in.0' => '休憩時間が不適切な値です']);
     }
 
-    public function test_休憩終了時間が退勤時間より後になっている場合、エラーメッセージが表示される()
+    public function test_休憩終了時間が退勤時間より後になっている場合、エラーメッセージが表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $attendanceRecord = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '退勤済']);
@@ -60,7 +60,7 @@ class No11_UserAttendanceCorrectionTest extends TestCase
         $response->assertSessionHasErrors(['new_break_out.0' => '休憩時間もしくは退勤時間が不適切な値です']);
     }
 
-    public function test_備考欄が未入力の場合のエラーメッセージが表示される()
+    public function test_備考欄が未入力の場合のエラーメッセージが表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $attendanceRecord = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '退勤済']);
@@ -76,7 +76,7 @@ class No11_UserAttendanceCorrectionTest extends TestCase
         $response->assertSessionHasErrors(['comment' => '備考を記入してください']);
     }
 
-    public function test_修正申請処理が実行される()
+    public function test_修正申請処理が実行される(): void
     {
         $this->withoutExceptionHandling();
         $user = User::factory()->create(['admin_status' => false]);
@@ -105,7 +105,7 @@ class No11_UserAttendanceCorrectionTest extends TestCase
             ->assertSee('電車遅延のため修正');
     }
 
-    public function test_承認待ちにログインユーザーが行った申請が全て表示されていること()
+    public function test_承認待ちにログインユーザーが行った申請が全て表示されていること(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $attendanceRecord = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '出勤中']);
@@ -123,7 +123,7 @@ class No11_UserAttendanceCorrectionTest extends TestCase
             ->assertSee($attendanceCorrection->comment);
     }
 
-    public function test_承認済みに管理者が承認した修正申請が全て表示されている()
+    public function test_承認済みに管理者が承認した修正申請が全て表示されている(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $attendanceRecord = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '出勤中']);
@@ -141,7 +141,7 @@ class No11_UserAttendanceCorrectionTest extends TestCase
             ->assertSee($attendanceCorrection->comment);
     }
 
-    public function test_各申請の詳細を押下すると勤怠詳細画面に遷移する()
+    public function test_各申請の詳細を押下すると勤怠詳細画面に遷移する(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $attendanceRecord = AttendanceRecord::factory()->create(['user_id' => $user->id, 'status' => '出勤中']);

@@ -13,8 +13,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
+/**
+ * 一般ユーザー向けの勤怠管理および修正申請を制御するコントローラー。
+ *
+ * ユーザー自身の勤怠一覧の閲覧、詳細確認、および勤怠修正の申請処理を行う。
+ */
 class AttendanceController extends Controller
 {
+    /**
+     * ログインユーザーの月次勤怠一覧画面を表示する。
+     *
+     * 指定された月（または現在月）の勤怠データを取得し、
+     * 各レコードの休憩時間や合計勤務時間を計算してビューに渡す。
+     *
+     * @param  Request  $request  クエリパラメータ（date等）を含むHTTPリクエスト
+     * @return View 一般ユーザー用勤怠一覧画面のビュー
+     */
     public function index(Request $request): View
     {
         $user = Auth::user();
@@ -59,11 +73,20 @@ class AttendanceController extends Controller
         return view('user.user-attendance-list', compact('date', 'previousMonth', 'nextMonth', 'formattedAttendanceRecords'));
     }
 
+    /**
+     * ログインユーザーの指定勤怠詳細画面を表示する。
+     *
+     * 承認待ちの修正申請が存在する場合はその申請内容を優先して表示し、
+     * 存在しない場合は通常の勤怠データ（またはバリデーションエラー時の old 入力値）を反映してビューに渡す。
+     *
+     * @param  int  $id  対象の勤怠レコードID
+     * @return View 一般ユーザー用勤怠詳細画面のビュー
+     */
     public function show(int $id): View
     {
         $user = Auth::user();
 
-        $record = AttendanceRecord::with(['attendanceBreaks', 'attendanceCorrections' => fn ($q) => $q->where('status', '承認待ち')->with('correctionBreaks')])
+        $record = AttendanceRecord::with(['attendanceBreaks', 'attendanceCorrections' => fn($q) => $q->where('status', '承認待ち')->with('correctionBreaks')])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 
@@ -79,7 +102,7 @@ class AttendanceController extends Controller
                 'clock_out' => $pendingCorrection->clock_out ? Carbon::parse($pendingCorrection->clock_out)->format('H:i') : '',
                 'comment' => $pendingCorrection->comment ?? '',
                 'application' => $pendingCorrection,
-                'breaks' => $pendingCorrection->correctionBreaks->map(fn ($b) => [
+                'breaks' => $pendingCorrection->correctionBreaks->map(fn($b) => [
                     'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
                     'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
                 ])->toArray(),
@@ -105,7 +128,7 @@ class AttendanceController extends Controller
                     array_pop($breaks);
                 }
             } else {
-                $breaks = $record->attendanceBreaks->map(fn ($b) => [
+                $breaks = $record->attendanceBreaks->map(fn($b) => [
                     'break_in' => $b->break_in ? Carbon::parse($b->break_in)->format('H:i') : '',
                     'break_out' => $b->break_out ? Carbon::parse($b->break_out)->format('H:i') : '',
                 ])->toArray();
@@ -126,6 +149,16 @@ class AttendanceController extends Controller
         return view('user.user-detail', compact('user', 'data'));
     }
 
+    /**
+     * 勤怠の修正申請を新規作成（ストア）する。
+     *
+     * すでに承認待ちの申請が存在する場合は処理を拒否し、
+     * データベーストランザクション内で修正申請本体および関連する休憩修正データを安全に登録する。
+     *
+     * @param  AttendanceCorrectionRequest  $request  バリデーション済みの修正申請リクエスト
+     * @param  int                           $id       対象の勤怠レコードID
+     * @return RedirectResponse 申請一覧画面へのリダイレクト、またはエラー時の差し戻し
+     */
     public function store(AttendanceCorrectionRequest $request, int $id): RedirectResponse
     {
         $validated = $request->validated();
@@ -145,8 +178,8 @@ class AttendanceController extends Controller
             $correction = AttendanceCorrection::create([
                 'attendance_record_id' => $record->id,
                 'user_id' => Auth::id(),
-                'clock_in' => Carbon::parse($dateStr.' '.$clockIn),
-                'clock_out' => Carbon::parse($dateStr.' '.$clockOut),
+                'clock_in' => Carbon::parse($dateStr . ' ' . $clockIn),
+                'clock_out' => Carbon::parse($dateStr . ' ' . $clockOut),
                 'comment' => $validated['comment'],
                 'status' => '承認待ち',
             ]);
@@ -161,8 +194,8 @@ class AttendanceController extends Controller
                     if (! empty($breakIn) && ! empty($breakOut)) {
                         CorrectionBreak::create([
                             'attendance_correction_id' => $correction->id,
-                            'break_in' => Carbon::parse($dateStr.' '.$breakIn),
-                            'break_out' => Carbon::parse($dateStr.' '.$breakOut),
+                            'break_in' => Carbon::parse($dateStr . ' ' . $breakIn),
+                            'break_out' => Carbon::parse($dateStr . ' ' . $breakOut),
                         ]);
                     }
                 }

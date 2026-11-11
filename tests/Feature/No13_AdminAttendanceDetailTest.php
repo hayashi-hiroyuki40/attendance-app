@@ -11,7 +11,7 @@ class No13_AdminAttendanceDetailTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_勤怠詳細画面に表示されるデータが選択したものになっている()
+    public function test_勤怠詳細画面に表示されるデータが選択したものになっている(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false, 'name' => '山田太郎']);
@@ -29,7 +29,7 @@ class No13_AdminAttendanceDetailTest extends TestCase
             ->assertSee('10月7日');
     }
 
-    public function test_出勤時間が退勤時間より後になっている場合、エラーメッセージが表示される()
+    public function test_出勤時間が退勤時間より後になっている場合、エラーメッセージが表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false, 'name' => '山田太郎']);
@@ -49,7 +49,7 @@ class No13_AdminAttendanceDetailTest extends TestCase
         $response->assertSessionHasErrors(['new_clock_in' => '出勤時間もしくは退勤時間が不適切な値です']);
     }
 
-    public function test_休憩開始時間が退勤時間より後になっている場合、エラーメッセージが表示される()
+    public function test_休憩開始時間が退勤時間より後になっている場合、エラーメッセージが表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false, 'name' => '山田太郎']);
@@ -70,7 +70,7 @@ class No13_AdminAttendanceDetailTest extends TestCase
         $response->assertSessionHasErrors(['new_break_in.0' => '休憩時間が不適切な値です']);
     }
 
-    public function test_休憩終了時間が退勤時間より後になっている場合、エラーメッセージが表示される()
+    public function test_休憩終了時間が退勤時間より後になっている場合、エラーメッセージが表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false, 'name' => '山田太郎']);
@@ -91,7 +91,7 @@ class No13_AdminAttendanceDetailTest extends TestCase
         $response->assertSessionHasErrors(['new_break_out.0' => '休憩時間もしくは退勤時間が不適切な値です']);
     }
 
-    public function test_備考欄が未入力の場合のエラーメッセージが表示される()
+    public function test_備考欄が未入力の場合のエラーメッセージが表示される(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false, 'name' => '山田太郎']);

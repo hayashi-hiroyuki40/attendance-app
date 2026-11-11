@@ -12,7 +12,7 @@ class No15_AdminCorrectionApproveTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_承認待ちの修正申請が全て表示されている()
+    public function test_承認待ちの修正申請が全て表示されている(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user1 = User::factory()->create(['admin_status' => false]);
@@ -31,7 +31,7 @@ class No15_AdminCorrectionApproveTest extends TestCase
             ->assertSee($correction2->comment);
     }
 
-    public function test_承認済みの修正申請が全て表示されている()
+    public function test_承認済みの修正申請が全て表示されている(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user1 = User::factory()->create(['admin_status' => false]);
@@ -45,7 +45,7 @@ class No15_AdminCorrectionApproveTest extends TestCase
             ->assertSee($correction1->comment);
     }
 
-    public function test_修正申請の詳細内容が正しく表示されている()
+    public function test_修正申請の詳細内容が正しく表示されている(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false, 'name' => '申請太郎']);
@@ -70,7 +70,7 @@ class No15_AdminCorrectionApproveTest extends TestCase
             ->assertSee('遅延のため時間変更');
     }
 
-    public function test_修正申請の承認処理が正しく行われる()
+    public function test_修正申請の承認処理が正しく行われる(): void
     {
         $admin = User::factory()->create(['admin_status' => true]);
         $user = User::factory()->create(['admin_status' => false]);

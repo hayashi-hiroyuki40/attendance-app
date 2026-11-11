@@ -12,7 +12,7 @@ class No05_AttendanceStatusTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_勤務外の場合_勤怠ステータスが正しく表示される()
+    public function test_勤務外の場合_勤怠ステータスが正しく表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
 
@@ -21,7 +21,7 @@ class No05_AttendanceStatusTest extends TestCase
         $response->assertSee('勤務外');
     }
 
-    public function test_出勤中の場合_勤怠ステータスが正しく表示される()
+    public function test_出勤中の場合_勤怠ステータスが正しく表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
@@ -36,7 +36,7 @@ class No05_AttendanceStatusTest extends TestCase
         $response->assertSee('出勤中');
     }
 
-    public function test_休憩中の場合_勤怠ステータスが正しく表示される()
+    public function test_休憩中の場合_勤怠ステータスが正しく表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
@@ -51,7 +51,7 @@ class No05_AttendanceStatusTest extends TestCase
         $response->assertSee('休憩中');
     }
 
-    public function test_退勤済の場合_勤怠ステータスが正しく表示される()
+    public function test_退勤済の場合_勤怠ステータスが正しく表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([

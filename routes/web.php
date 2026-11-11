@@ -77,4 +77,10 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminCorrectionController::class, 'update']);
 
     Route::post('/export', [AttendanceController::class, 'exportCsv']);
+
+    Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy']);
+});
+
+Route::get('/', function () {
+    return redirect('/admin/login');
 });

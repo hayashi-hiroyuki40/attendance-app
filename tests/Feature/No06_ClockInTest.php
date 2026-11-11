@@ -11,7 +11,7 @@ class No06_ClockInTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_出勤ボタンが正しく機能する()
+    public function test_出勤ボタンが正しく機能する(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
 
@@ -26,7 +26,7 @@ class No06_ClockInTest extends TestCase
         $responseAfter->assertSee('出勤中');
     }
 
-    public function test_出勤は一日一回のみできる()
+    public function test_出勤は一日一回のみできる(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
@@ -42,7 +42,7 @@ class No06_ClockInTest extends TestCase
         $response->assertDontSee('出勤');
     }
 
-    public function test_出勤時刻が勤怠一覧画面で確認できる()
+    public function test_出勤時刻が勤怠一覧画面で確認できる(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
 

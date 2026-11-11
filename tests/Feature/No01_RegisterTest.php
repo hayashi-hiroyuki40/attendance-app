@@ -9,7 +9,7 @@ class No01_RegisterTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_名前が未入力の場合_バリデーションメッセージが表示される()
+    public function test_名前が未入力の場合_バリデーションメッセージが表示される(): void
     {
         $response = $this->post('/register', [
             'email' => 'test@example.com',
@@ -22,7 +22,7 @@ class No01_RegisterTest extends TestCase
         ]);
     }
 
-    public function test_メールアドレスが未入力の場合_バリデーションメッセージが表示される()
+    public function test_メールアドレスが未入力の場合_バリデーションメッセージが表示される(): void
     {
         $response = $this->post('/register', [
             'name' => '単体テスト',
@@ -35,7 +35,7 @@ class No01_RegisterTest extends TestCase
         ]);
     }
 
-    public function test_パスワードが8文字未満の場合_バリデーションメッセージが表示される()
+    public function test_パスワードが8文字未満の場合_バリデーションメッセージが表示される(): void
     {
         $response = $this->post('/register', [
             'name' => '単体テスト',
@@ -49,7 +49,7 @@ class No01_RegisterTest extends TestCase
         ]);
     }
 
-    public function test_パスワードが一致しない場合_バリデーションメッセージが表示される()
+    public function test_パスワードが一致しない場合_バリデーションメッセージが表示される(): void
     {
         $response = $this->post('/register', [
             'name' => '単体テスト',
@@ -63,7 +63,7 @@ class No01_RegisterTest extends TestCase
         ]);
     }
 
-    public function test_パスワードが未入力の場合_バリデーションメッセージが表示される()
+    public function test_パスワードが未入力の場合_バリデーションメッセージが表示される(): void
     {
         $response = $this->post('/register', [
             'name' => '単体テスト',
@@ -75,7 +75,7 @@ class No01_RegisterTest extends TestCase
         ]);
     }
 
-    public function test_フォームに内容が入力されていた場合_データが正常に保存される()
+    public function test_フォームに内容が入力されていた場合_データが正常に保存される(): void
     {
         $response = $this->post('/register', [
             'name' => '単体テスト',

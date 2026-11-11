@@ -12,7 +12,7 @@ class No19_AttendanceAuthApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_未認証時に書き込み系_ap_iで401が返ること()
+    public function test_未認証時に書き込み系_apiで401が返ること(): void
     {
         $attendance = AttendanceRecord::factory()->create();
 
@@ -29,7 +29,7 @@ class No19_AttendanceAuthApiTest extends TestCase
             ->assertJson(['message' => 'Unauthenticated.']);
     }
 
-    public function test_認証済みユーザーが自分の勤怠を更新_削除できること()
+    public function test_認証済みユーザーが自分の勤怠を更新_削除できること(): void
     {
         $user = User::factory()->create();
         $attendance = AttendanceRecord::factory()->create(['user_id' => $user->id]);
@@ -44,7 +44,7 @@ class No19_AttendanceAuthApiTest extends TestCase
             ->assertStatus(204);
     }
 
-    public function test_他ユーザーの勤怠を更新_削除しようとすると403が返ること()
+    public function test_他ユーザーの勤怠を更新_削除しようとすると403が返ること(): void
     {
         $owner = User::factory()->create();
         $otherUser = User::factory()->create();

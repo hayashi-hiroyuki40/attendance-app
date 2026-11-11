@@ -9,8 +9,20 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * 管理者向けのスタッフ別勤怠管理およびCSVエクスポートを制御するコントローラー。
+ *
+ * 一般スタッフの一覧表示、特定スタッフの月次勤怠詳細の閲覧、および勤怠データのCSV出力を行う。
+ */
 class StaffAttendanceController extends Controller
 {
+    /**
+     * 一般スタッフ一覧画面を表示する。
+     *
+     * 管理者権限を持たない一般ユーザー（admin_status が false）の一覧を取得してビューに渡す。
+     *
+     * @return View スタッフ一覧画面のビュー
+     */
     public function index(): View
     {
         $users = User::where('admin_status', false)->get();
@@ -18,6 +30,16 @@ class StaffAttendanceController extends Controller
         return view('admin.staff-list', compact('users'));
     }
 
+    /**
+     * 指定されたスタッフの月次勤怠一覧画面を表示する。
+     *
+     * クエリパラメータ（month または date）で指定された月、または現在月を基準に、
+     * 該当スタッフの勤怠レコードや休憩時間を取得し、各日ごとの数値を整形してビューに渡す。
+     *
+     * @param  Request  $request  クエリパラメータ（month, date等）を含むHTTPリクエスト
+     * @param  int      $id       対象スタッフのユーザーID
+     * @return View スタッフ別月次勤怠一覧画面のビュー
+     */
     public function show(Request $request, int $id): View
     {
         $user = User::where('admin_status', false)->findOrFail($id);
@@ -27,8 +49,7 @@ class StaffAttendanceController extends Controller
         if ($dateParam) {
             $date = Carbon::parse($dateParam);
         } else {
-            $latestRecord = AttendanceRecord::where('user_id', $user->id)->latest('date')->first();
-            $date = $latestRecord ? Carbon::parse($latestRecord->date) : Carbon::now();
+            $date = Carbon::now();
         }
         $previousMonth = $date->copy()->subMonth()->format('Y-m');
         $nextMonth = $date->copy()->addMonth()->format('Y-m');
@@ -72,6 +93,15 @@ class StaffAttendanceController extends Controller
         ));
     }
 
+    /**
+     * 指定されたスタッフの月次勤怠データをCSV形式でエクスポートする。
+     *
+     * 該当ユーザーおよび対象月の勤怠レコードをストリーミングレスポンスで出力し、
+     * Excel等での文字化けを防ぐためのBOM付きUTF-8としてCSVファイルをダウンロードさせる。
+     *
+     * @param  Request  $request  対象ユーザーID（user_id）と対象月（year_month）を含むHTTPリクエスト
+     * @return StreamedResponse CSVファイルのストリーミングダウンロードレスポンス
+     */
     public function exportCsv(Request $request): StreamedResponse
     {
         $userId = $request->input('user_id');
@@ -88,28 +118,33 @@ class StaffAttendanceController extends Controller
 
         return new StreamedResponse(function () use ($records) {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
             fputcsv($handle, ['日付', '出勤', '退勤', '休憩', '合計']);
 
-            $records->map(function ($r) {
+            foreach ($records as $r) {
                 $breakMins = $r->attendanceBreaks->sum(
-                    fn ($b) => $b->break_in && $b->break_out ? Carbon::parse($b->break_in)->diffInMinutes(Carbon::parse($b->break_out)) : 0
+                    fn($b) => $b->break_in && $b->break_out ? Carbon::parse($b->break_in)->diffInMinutes(Carbon::parse($b->break_out)) : 0
                 );
 
                 $workMins = ($r->clock_in && $r->clock_out)
                     ? Carbon::parse($r->clock_in)->diffInMinutes(Carbon::parse($r->clock_out)) - $breakMins
                     : 0;
 
-                return [
+                $row = [
                     $r->date,
                     $r->clock_in ? Carbon::parse($r->clock_in)->format('G:i') : '',
                     $r->clock_out ? Carbon::parse($r->clock_out)->format('G:i') : '',
                     $breakMins ? sprintf('%d:%02d', intdiv($breakMins, 60), $breakMins % 60) : '',
                     $workMins > 0 ? sprintf('%d:%02d', intdiv($workMins, 60), $workMins % 60) : '',
                 ];
-            })->each(fn ($row) => fputcsv($handle, $row));
+
+                fputcsv($handle, $row);
+            }
 
             fclose($handle);
-        }, 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => "attachment; filename=\"{$fileName}\""]);
+        }, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+        ]);
     }
 }

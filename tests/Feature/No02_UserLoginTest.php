@@ -10,7 +10,8 @@ class No02_UserLoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_メールアドレスが未入力の場合_バリデーションメッセージが表示される()
+    public function test_メールアドレスが未入力の場合_バリデーションメッセージが表示される(): void
+
     {
         $user = User::factory()->create(['admin_status' => false]);
 
@@ -23,7 +24,7 @@ class No02_UserLoginTest extends TestCase
         ]);
     }
 
-    public function test_パスワードが未入力の場合_バリデーションメッセージが表示される()
+    public function test_パスワードが未入力の場合_バリデーションメッセージが表示される(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
 
@@ -36,7 +37,7 @@ class No02_UserLoginTest extends TestCase
         ]);
     }
 
-    public function test_登録内容と一致しない場合_バリデーションメッセージが表示される()
+    public function test_登録内容と一致しない場合_バリデーションメッセージが表示される(): void
     {
         User::factory()->create(['admin_status' => false, 'email' => 'this@example.com']);
 

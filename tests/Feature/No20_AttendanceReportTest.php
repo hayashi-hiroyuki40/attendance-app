@@ -13,20 +13,20 @@ class No20_AttendanceReportTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_ゲストはレポートページにアクセスできない()
+    public function test_ゲストはレポートページにアクセスできない(): void
     {
         $response = $this->get('/attendance/report');
 
         $response->assertRedirect('/login');
     }
 
-    public function test_認証ユーザーの統計情報が正しく計算される()
+    public function test_認証ユーザーの統計情報が正しく計算される(): void
     {
         $user = User::factory()->create();
 
         $targetDate = Carbon::now()->startOfMonth()->toDateString();
-        $clockIn = Carbon::parse($targetDate.' 09:15:00');
-        $clockOut = Carbon::parse($targetDate.' 19:15:00');
+        $clockIn = Carbon::parse($targetDate . ' 09:15:00');
+        $clockOut = Carbon::parse($targetDate . ' 19:15:00');
 
         $record = AttendanceRecord::create([
             'user_id' => $user->id,
@@ -38,8 +38,8 @@ class No20_AttendanceReportTest extends TestCase
 
         AttendanceBreak::create([
             'attendance_record_id' => $record->id,
-            'break_in' => Carbon::parse($targetDate.' 12:00:00'),
-            'break_out' => Carbon::parse($targetDate.' 13:00:00'),
+            'break_in' => Carbon::parse($targetDate . ' 12:00:00'),
+            'break_out' => Carbon::parse($targetDate . ' 13:00:00'),
         ]);
 
         $response = $this->actingAs($user)->get('/attendance/report');
@@ -50,7 +50,7 @@ class No20_AttendanceReportTest extends TestCase
         $response->assertViewHas('anomalies');
     }
 
-    public function test_勤怠記録がないユーザーで安全に処理される()
+    public function test_勤怠記録がないユーザーで安全に処理される(): void
     {
         $user = User::factory()->create();
 

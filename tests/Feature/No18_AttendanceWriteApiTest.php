@@ -12,7 +12,7 @@ class No18_AttendanceWriteApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_認証済みユーザーが勤怠を新規登録できること()
+    public function test_認証済みユーザーが勤怠を新規登録できること(): void
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user, ['*']);
@@ -36,7 +36,7 @@ class No18_AttendanceWriteApiTest extends TestCase
         ]);
     }
 
-    public function test_不正データで勤怠登録した場合は422エラーと日本語メッセージが返ること()
+    public function test_不正データで勤怠登録した場合は422エラーと日本語メッセージが返ること(): void
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user, ['*']);
@@ -47,7 +47,7 @@ class No18_AttendanceWriteApiTest extends TestCase
             ->assertJsonValidationErrors(['date', 'clock_in']);
     }
 
-    public function test_認証済みユーザーが自分の勤怠を更新できること()
+    public function test_認証済みユーザーが自分の勤怠を更新できること(): void
     {
         $user = User::factory()->create();
         $record = AttendanceRecord::factory()->create([
@@ -70,7 +70,7 @@ class No18_AttendanceWriteApiTest extends TestCase
             ->assertJsonPath('data.comment', '更新しました');
     }
 
-    public function test_存在しない勤怠を更新しようとした場合は404エラーが返ること()
+    public function test_存在しない勤怠を更新しようとした場合は404エラーが返ること(): void
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user, ['*']);
@@ -86,7 +86,7 @@ class No18_AttendanceWriteApiTest extends TestCase
             ]);
     }
 
-    public function test_認証済みユーザーが自分の勤怠を削除できること()
+    public function test_認証済みユーザーが自分の勤怠を削除できること(): void
     {
         $user = User::factory()->create();
         $record = AttendanceRecord::factory()->create([
@@ -103,7 +103,7 @@ class No18_AttendanceWriteApiTest extends TestCase
         $this->assertDatabaseMissing('attendance_records', ['id' => $record->id]);
     }
 
-    public function test_存在しない勤怠を削除しようとした場合は404エラーが返ること()
+    public function test_存在しない勤怠を削除しようとした場合は404エラーが返ること(): void
     {
         $user = User::factory()->create();
         Sanctum::actingAs($user, ['*']);

@@ -110,7 +110,7 @@ erDiagram
     users ||--o{ attendance_corrections : "1対多"
     attendance_records ||--o{ attendance_corrections : "1対多"
     attendance_records ||--o{ attendance_breaks : "1対多"
-    attendance_corrections ||--o{ corrections_breaks : "1対多"
+    attendance_corrections ||--o{ correction_breaks : "1対多"
 
     users {
         bigint id PK
@@ -157,7 +157,7 @@ erDiagram
         timestamp updated_at
     }
 
-    corrections_breaks {
+    correction_breaks {
         bigint id PK
         bigint attendance_correction_id FK
         datetime break_in

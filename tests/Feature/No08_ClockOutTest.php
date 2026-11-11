@@ -12,7 +12,7 @@ class No08_ClockOutTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_退勤ボタンが正しく機能する()
+    public function test_退勤ボタンが正しく機能する(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
@@ -30,7 +30,7 @@ class No08_ClockOutTest extends TestCase
         $this->get('/attendance')->assertSee('退勤済');
     }
 
-    public function test_退勤時刻が勤怠一覧画面で確認できる()
+    public function test_退勤時刻が勤怠一覧画面で確認できる(): void
     {
         Carbon::setTestNow('2026-09-30 09:00:00');
 

@@ -11,7 +11,7 @@ class No17_AttendanceReadApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_公開_ap_iで勤怠一覧が正常に取得できること()
+    public function test_公開_apiで勤怠一覧が正常に取得できること(): void
     {
         $user = User::factory()->create();
         AttendanceRecord::factory()->create([
@@ -47,7 +47,7 @@ class No17_AttendanceReadApiTest extends TestCase
             ]);
     }
 
-    public function test_公開_ap_iで勤怠詳細が正常に取得できること()
+    public function test_公開_apiで勤怠詳細が正常に取得できること(): void
     {
         $user = User::factory()->create();
         $record = AttendanceRecord::factory()->create([
@@ -75,7 +75,7 @@ class No17_AttendanceReadApiTest extends TestCase
             ]);
     }
 
-    public function test_存在しない勤怠_i_dを指定した場合は404エラーが返ること()
+    public function test_存在しない勤怠_idを指定した場合は404エラーが返ること(): void
     {
         $response = $this->getJson('/api/v1/attendance-records/99999');
 

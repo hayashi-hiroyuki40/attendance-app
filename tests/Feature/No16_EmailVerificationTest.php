@@ -13,7 +13,7 @@ class No16_EmailVerificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_会員登録後_認証メールが送信される()
+    public function test_会員登録後_認証メールが送信される(): void
     {
         Notification::fake();
 
@@ -32,7 +32,7 @@ class No16_EmailVerificationTest extends TestCase
         );
     }
 
-    public function test_メール認証誘導画面でボタンを押下するとメール認証サイトに遷移する()
+    public function test_メール認証誘導画面でボタンを押下するとメール認証サイトに遷移する(): void
     {
         $this->withoutExceptionHandling();
         $user = User::factory()->create([
@@ -54,7 +54,7 @@ class No16_EmailVerificationTest extends TestCase
         $response->assertRedirect('/attendance');
     }
 
-    public function test_メール認証サイトのメール認証を完了すると勤怠登録画面に遷移する()
+    public function test_メール認証サイトのメール認証を完了すると勤怠登録画面に遷移する(): void
     {
         $user = User::factory()->create([
             'email_verified_at' => null,

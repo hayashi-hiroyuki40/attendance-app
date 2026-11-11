@@ -9,8 +9,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+/**
+ * 一般ユーザー向けの出退勤打刻を制御するコントローラー。
+ *
+ * 本日の打刻画面の表示（現在のステータス判定）、および出勤・休憩・退勤の打刻アクション処理を行う。
+ */
 class AttendanceRecordController extends Controller
 {
+    /**
+     * 本日の打刻画面を表示する。
+     *
+     * 現在の日時、曜日、およびログインユーザーの今日の打刻状態（勤務外 / 出勤中 / 休憩中 / 退勤済）を取得し、
+     * ビューに渡して表示する。
+     *
+     * @return View 打刻画面のビュー
+     */
     public function index(): View
     {
         $user = Auth::user();
@@ -32,6 +45,15 @@ class AttendanceRecordController extends Controller
         return view('user.attendance-register', compact('user', 'formattedDate', 'formattedTime'));
     }
 
+    /**
+     * 打刻アクション（出勤・休憩入・休憩戻・退勤）を実行する。
+     *
+     * リクエストに含まれる action パラメータに応じて、現在のステータスやバリデーションを考慮しながら
+     * 勤怠レコードおよび休憩レコードの状態を更新する。
+     *
+     * @param  Request  $request  アクション名（clock_in, break_in等）を含むHTTPリクエスト
+     * @return RedirectResponse 処理完了後の直前のページへのリダイレクト
+     */
     public function store(Request $request): RedirectResponse
     {
         $user = Auth::user();

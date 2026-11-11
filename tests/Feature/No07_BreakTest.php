@@ -11,7 +11,7 @@ class No07_BreakTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_休憩ボタンが正しく機能する()
+    public function test_休憩ボタンが正しく機能する(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
@@ -31,7 +31,7 @@ class No07_BreakTest extends TestCase
         $this->get('/attendance')->assertSee('休憩中');
     }
 
-    public function test_休憩は一日に何回でもできる()
+    public function test_休憩は一日に何回でもできる(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
@@ -51,7 +51,7 @@ class No07_BreakTest extends TestCase
         $response->assertSee('休憩入');
     }
 
-    public function test_休憩戻ボタンが正しく機能する()
+    public function test_休憩戻ボタンが正しく機能する(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
@@ -70,7 +70,7 @@ class No07_BreakTest extends TestCase
         $this->get('/attendance')->assertSee('出勤中');
     }
 
-    public function test_休憩戻は一日に何回でもできる()
+    public function test_休憩戻は一日に何回でもできる(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         AttendanceRecord::factory()->create([
@@ -93,7 +93,7 @@ class No07_BreakTest extends TestCase
         $response->assertSee('休憩戻');
     }
 
-    public function test_休憩時刻が勤怠一覧画面で確認できる()
+    public function test_休憩時刻が勤怠一覧画面で確認できる(): void
     {
         $user = User::factory()->create(['admin_status' => false]);
         $attendance = AttendanceRecord::factory()->create([
